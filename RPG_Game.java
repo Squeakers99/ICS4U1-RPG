@@ -13,9 +13,29 @@ public class RPG_Game{
         //Initializes the console
         Console con = new Console("The Great RPG", 600,600);
 
-        System.out.println(GameMenu(con));
+        //Initializes string variables
+        String strChoice;
+
+        boolean boolPlay = false;
+
+        while(!boolPlay){
+            strChoice = GameMenu(con);
+            
+            if(strChoice.equals("Select Map")){
+                
+            }else if(strChoice.equals("Help")){
+
+            }else if(strChoice.equals("Quit")){
+                con.closeConsole();
+            }else{
+                boolPlay = true;
+            }
+        }
+
+        Play.Game(con, "Map 1");
     }
 
+    //Method to display the menu
     public static String GameMenu(Console con){
         //Loads the menu fonts into the game
         Font fntTitle = con.loadFont("Fonts/Menu Title.ttf", 100);
