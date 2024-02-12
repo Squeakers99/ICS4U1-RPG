@@ -3,6 +3,10 @@ import java.awt.*;
 import java.awt.image.*;
 
 public class Play {
+    //Creates variables to be accessible by all methods
+    private static int intHealth = 50;
+    private static boolean boolContinue = true;
+
     //Method to play the game
     public static void Game(Console con, String strMapChoice){
         //Initializes all Array variables
@@ -16,8 +20,15 @@ public class Play {
         //Initializes all Integer variables
         int intCountRows = 0;
         int intCountColumns = 0;
+
         int intPlayerRow = 0;
         int intPlayerCol = 0;
+        int intPlayerX = 0;
+        int intPlayerY = 0;
+        int intAnimationLoop;
+
+        int intPlayerDefence = 20;
+        int intPlayerDamage = 10;
 
         //Initializes all character variables
         char chrKeyPressed;
@@ -27,7 +38,6 @@ public class Play {
 
         //Initializes all pictures required for play
         BufferedImage imgPlayer = con.loadImage("Images/Avatars/Player.png");
-        //BufferedImage imgDrowned = con.loadImage("Images/Other/Drowned.png");
 
         //Loads the array with the chosen map
         for(intCountRows = 0; intCountRows < 20; intCountRows++){
@@ -38,58 +48,114 @@ public class Play {
             }
         }
 
-        //Calls the method to draw the map
+        //Calls the method to draw the map and draws the player
         drawMap(con, intCountColumns, intCountRows, strMap);
+        con.drawImage(imgPlayer, intPlayerCol, intPlayerRow);
+        con.repaint();
 
         //Loops to get WASD Player Movement
-        while(true){
+        while(boolContinue){
             //Gets the current key pressed
-            chrKeyPressed = con.currentChar();
+            chrKeyPressed = con.getChar();
 
-            //Check for movement
-            if((chrKeyPressed == 'w')  || (chrKeyPressed == 'a') || (chrKeyPressed == 's') || (chrKeyPressed == 'd')){
-                //If up, this runs
-                if(chrKeyPressed == 'w'){
-                    //Gets the next block the user is trying to move to
-                    strNextBlock = strMap[intPlayerRow - 1][intPlayerCol];
+            //Tries to run this code for movement
+            try{
+                //Check for movement
+                if((chrKeyPressed == 'w')  || (chrKeyPressed == 'a') || (chrKeyPressed == 's') || (chrKeyPressed == 'd') || chrKeyPressed == 'h'){
+                    //If up, this runs
+                    if(chrKeyPressed == 'w'){
+                        strNextBlock = strMap[intPlayerRow - 1][intPlayerCol];
 
-                    //Calls the action method to get the new row position
-                    intPlayerRow = action(con, strNextBlock, chrKeyPressed, intPlayerRow);
+                        //Calls the action method to get the new Y position
+                        intPlayerY = action(con, strNextBlock, chrKeyPressed, intPlayerY, imgPlayer);
 
-                //If down, this runs
-                }else if(chrKeyPressed == 's'){
-                    //Gets the next block the user is trying to move to
-                    strNextBlock = strMap[intPlayerRow + 1][intPlayerCol];
+                        //Animates Movement
+                        if(intPlayerY != intPlayerRow*30){
+                            intPlayerY += 30;
+                            for(intAnimationLoop = 0; intAnimationLoop < 30; intAnimationLoop += 5){
+                                intPlayerY -= 5;
+                                drawMap(con, intCountColumns, intCountRows, strMap);
+                                con.drawImage(imgPlayer, intPlayerX, intPlayerY);
+                                con.repaint();
+                                con.sleep(33);
+                            }
+                        }
 
-                    //Calls the action method to get the new row position
-                    intPlayerRow = action(con, strNextBlock, chrKeyPressed, intPlayerRow);
+                        intPlayerRow = intPlayerY/30;
 
-                //If left, this runs
-                }else if(chrKeyPressed == 'a'){
-                    //Gets the next block the user is trying to move to
-                    strNextBlock = strMap[intPlayerRow][intPlayerCol - 1];
+                    //If down, this runs
+                    }else if(chrKeyPressed == 's'){
+                        strNextBlock = strMap[intPlayerRow + 1][intPlayerCol];
 
-                    //Calls the action method to get the new column position
-                    intPlayerCol = action(con, strNextBlock, chrKeyPressed, intPlayerCol);
-                
-                //If right, this runs
-                }else if(chrKeyPressed == 'd'){
-                    //Gets the next block the user is trying to move to
-                    strNextBlock = strMap[intPlayerRow][intPlayerCol + 1];
+                        //Calls the action method to get the new Y position
+                        intPlayerY = action(con, strNextBlock, chrKeyPressed, intPlayerY, imgPlayer);
+
+                        //Animates Movement
+                        if(intPlayerY != intPlayerRow*30){
+                            intPlayerY -= 30;
+                            for(intAnimationLoop = 0; intAnimationLoop < 30; intAnimationLoop += 5){
+                                intPlayerY += 5;
+                                drawMap(con, intCountColumns, intCountRows, strMap);
+                                con.drawImage(imgPlayer, intPlayerX, intPlayerY);
+                                con.repaint();
+                                con.sleep(33);
+                            }
+                        }
+
+                        intPlayerRow = intPlayerY/30;
+
+                    //If left, this runs
+                    }else if(chrKeyPressed == 'a'){
+                        strNextBlock = strMap[intPlayerRow][intPlayerCol - 1];
+
+                        //Calls the action method to get the new X position
+                        intPlayerX = action(con, strNextBlock, chrKeyPressed, intPlayerX, imgPlayer);
+
+                        //Animates Movement
+                        if(intPlayerX != intPlayerCol*30){
+                            intPlayerX += 30;
+                            for(intAnimationLoop = 0; intAnimationLoop < 30; intAnimationLoop += 5){
+                                intPlayerX -= 5;
+                                drawMap(con, intCountColumns, intCountRows, strMap);
+                                con.drawImage(imgPlayer, intPlayerX, intPlayerY);
+                                con.repaint();
+                                con.sleep(33);
+                            }
+                        }
+
+                        intPlayerCol = intPlayerX/30;
                     
-                    //Calls the action method to get the new column position
-                    intPlayerCol = action(con, strNextBlock, chrKeyPressed, intPlayerCol);
+                    //If right, this runs
+                    }else if(chrKeyPressed == 'd'){
+                        strNextBlock = strMap[intPlayerRow][intPlayerCol + 1];
+                        
+                        //Calls the action method to get the new X position
+                        intPlayerX = action(con, strNextBlock, chrKeyPressed, intPlayerX, imgPlayer);
+
+                        //Animates Movement
+                        if(intPlayerX != intPlayerCol*30){
+                            intPlayerX -= 30;
+                            for(intAnimationLoop = 0; intAnimationLoop < 30; intAnimationLoop += 5){
+                                intPlayerX += 5;
+                                drawMap(con, intCountColumns, intCountRows, strMap);
+                                con.drawImage(imgPlayer, intPlayerX, intPlayerY);
+                                con.repaint();
+                                con.sleep(33);
+                            }
+                        }
+
+                        intPlayerCol = intPlayerX/30;
+
+                    //HUD bar to display the player's stats (health, defence, and damage)
+                    }else if(chrKeyPressed == 'h'){
+
+                    }
                 }
-                con.sleep(200);
-
-                //Redraws the map
-                drawMap(con, intCountColumns, intCountRows, strMap);
-            }
-
-            //Draws the player
-            con.drawImage(imgPlayer, intPlayerCol*30, intPlayerRow*30);
-            con.repaint();
-            con.sleep(33);
+                //Redraws the console
+                con.repaint();
+            
+            //If an array error is caught, the player cannot go there because it is outside the map. It does nothing
+            }catch(Exception ArrayIndexOutOfBounds){}
         }
     }
 
@@ -108,8 +174,8 @@ public class Play {
         BufferedImage imgTree = con.loadImage("Images/Blocks/Tree.png");
         BufferedImage imgBuilding = con.loadImage("Images/Blocks/Building.png");
         BufferedImage imgEnemy1 = con.loadImage("Images/Avatars/Enemy 1.png");
-        //BufferedImage imgEnemy2 = con.loadImage("Images/Avatars/Enemy 2.png");
-        //BufferedImage imgEnemy3 = con.loadImage("Images/Avatars/Enemy 3.png");
+        BufferedImage imgEnemy2 = con.loadImage("Images/Avatars/Enemy 2.png");
+        BufferedImage imgEnemy3 = con.loadImage("Images/Avatars/Enemy 3.png");
 
         //Loops to draw the board
         for(intCountRows = 0; intCountRows < 20; intCountRows++){
@@ -126,9 +192,9 @@ public class Play {
                 }else if(strBlock.equals("e1")){
                     con.drawImage(imgEnemy1, intBlockX, intBlockY);
                 }else if(strBlock.equals("e2")){
-                    //con.drawImage(imgEnemy2, intBlockX, intBlockY);
+                    con.drawImage(imgEnemy2, intBlockX, intBlockY);
                 }else if(strBlock.equals("e3")){
-                    //con.drawImage(imgEnemy3, intBlockX, intBlockY);
+                    con.drawImage(imgEnemy3, intBlockX, intBlockY);
                 }
                 intBlockX += 30;
             }
@@ -139,11 +205,15 @@ public class Play {
     }
 
     //Method for action logic
-    public static int action(Console con, String strNextBlock, char chrKeyPressed, int intPlayerMovement){
+    public static int action(Console con, String strNextBlock, char chrKeyPressed, int intPlayerMovement, BufferedImage imgPlayer){
+        //Loads in the Drowned Image
+        BufferedImage imgDrowned = con.loadImage("Images/Other/Drowned.png");
+        
         //Checks for Water on next block
         if(strNextBlock.equals("w")){
-            //con.drawImage(imgDrowned, 0, 0);
-        
+            con.drawImage(imgDrowned, 0, 0);
+            boolContinue = false;
+
         //Checks for Building on the next block
         }else if(strNextBlock.equals("b")){
             /*
@@ -164,14 +234,14 @@ public class Play {
         }
 
         //If the next block is anything but a tree, this will run
-        if(!strNextBlock.equals("t")){
+        if(!strNextBlock.equals("t") && !strNextBlock.equals("w")){
             //Moves row/column minus one if its 'w' or 'a'
             if(chrKeyPressed == 'w' || chrKeyPressed == 'a'){
-                intPlayerMovement -= 1;
+                intPlayerMovement -= 30;
         
             //Moves row/column plus one if its 's' or 'd'
             }else if(chrKeyPressed == 's' || chrKeyPressed == 'd'){
-                intPlayerMovement += 1;
+                intPlayerMovement += 30;
             }
         }
 
