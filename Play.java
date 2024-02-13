@@ -4,8 +4,10 @@ import java.awt.image.*;
 
 public class Play {
     //Creates variables to be accessible by all methods
-    private static int intHealth = 50;
-    private static boolean boolContinue = true;
+    private static int intPlayerHealth = 50;
+    private static int intPlayerDefence = 70;
+    private static int intPlayerDamage = 60;
+    private static boolean blnContinue = true;  
 
     //Method to play the game
     public static void Game(Console con, String strMapChoice){
@@ -25,10 +27,10 @@ public class Play {
         int intPlayerCol = 0;
         int intPlayerX = 0;
         int intPlayerY = 0;
-        int intAnimationLoop;
-
-        int intPlayerDefence = 20;
-        int intPlayerDamage = 10;
+        int intAnimationLoop = 0;
+        
+        //Initalizes all Boolean variables
+        boolean blnHUDActive = false;
 
         //Initializes all character variables
         char chrKeyPressed;
@@ -54,7 +56,7 @@ public class Play {
         con.repaint();
 
         //Loops to get WASD Player Movement
-        while(boolContinue){
+        while(blnContinue){
             //Gets the current key pressed
             chrKeyPressed = con.getChar();
 
@@ -148,7 +150,7 @@ public class Play {
 
                     //HUD bar to display the player's stats (health, defence, and damage)
                     }else if(chrKeyPressed == 'h'){
-
+                        blnHUDActive = HUD_Display(con, blnHUDActive, intAnimationLoop, imgPlayer, intPlayerX, intPlayerY, intCountColumns, intCountRows, strMap);
                     }
                 }
                 //Redraws the console
@@ -156,6 +158,21 @@ public class Play {
             
             //If an array error is caught, the player cannot go there because it is outside the map. It does nothing
             }catch(Exception ArrayIndexOutOfBounds){}
+        }
+    }
+    
+    //Custom method to draw a rectangle with a given thickness
+    public static void drawRectangleOutline(Console con, int intX, int intY, int intWidth, int intHeight, int intThickness){
+        //Defines a variable for the loop
+        int intCount;
+
+        //loops to create a rectangle with a given thickness
+        for(intCount = intThickness;intCount > 0;intCount--){
+            con.drawRect(intX,intY,intWidth,intHeight);
+            intX += 1;
+            intY += 1;
+            intWidth -= 2;
+            intHeight -= 2;
         }
     }
 
@@ -212,25 +229,21 @@ public class Play {
         //Checks for Water on next block
         if(strNextBlock.equals("w")){
             con.drawImage(imgDrowned, 0, 0);
-            boolContinue = false;
+            blnContinue = false;
 
         //Checks for Building on the next block
         }else if(strNextBlock.equals("b")){
-            /*
-            if(intHealth < 100){
-                intHealth += 10;
+            if(intPlayerHealth < 100){
+                intPlayerHealth += 10;
             }else{
-                Something here saying health maxed
+                //Something here saying health maxed
             }
-            */
 
         //Checks for Enemies on the next block
         }else if(strNextBlock.equals("e1") || strNextBlock.equals("e2") || strNextBlock.equals("e3")){
-            /*
-            if(intHealth > 0){
-                intHealth -= 10;
+            if(intPlayerHealth > 0){
+                intPlayerHealth -= 10;
             }
-            */
         }
 
         //If the next block is anything but a tree, this will run
@@ -247,5 +260,161 @@ public class Play {
 
         //Returns the movement, whether it be row or column
         return intPlayerMovement;
+    }
+
+    //Method to either display or hide the HUD bar with an animation
+    public static boolean HUD_Display(Console con, boolean blnHUDActive, int intAnimationLoop, BufferedImage imgPlayer, int intPlayerX, int intPlayerY, int intCountColumns, int intCountRows, String strMap[][]){
+        //Loads in the font for the display
+        Font fntHUDTitle = con.loadFont("Fonts/HUD Title.ttf", 50);
+        Font fntStats = con.loadFont("Fonts/Stats font.ttf",40);
+
+        //Loads images for the HUD
+        BufferedImage imgHealth = con.loadImage("Images/HUD Elements/Heart.png");
+        BufferedImage imgDefence = con.loadImage("Images/HUD Elements/Shield.png");
+        BufferedImage imgDamage = con.loadImage("Images/HUD Elements/Damage.png");
+
+        //Integer variables to animate the HUD
+        int intHUD_Y;
+        int intBarWitdh;
+        int intBarY;
+
+        //Colors for the HUD
+        Color clrBackground = new Color(114,6,6);
+        Color clrHealth = new Color(2,168,41);
+        Color clrDefence = new Color(0,0,204);
+        Color clrDamage = new Color(255,51,51);
+
+        //If the HUD is not currently active, this runs to pull it down
+        if(!blnHUDActive){
+            //Sets it to -300 initially to put it out of the screen
+            intHUD_Y = -300;
+
+            //Animates the HUD
+            for(intAnimationLoop = 0; intAnimationLoop <= 300; intAnimationLoop += 20){
+                //Redraws the map and player to get rid of the old HUD frame
+                drawMap(con, intCountColumns, intCountRows, strMap);
+                con.drawImage(imgPlayer, intPlayerX, intPlayerY);
+
+                //Fixes lag issues in the console
+                con.repaint();
+
+                //Draws the HUD background and title
+                con.setDrawColor(clrBackground);
+                con.fillRect(0, intHUD_Y, 600, 300);
+                con.setDrawColor(Color.white);
+                con.setDrawFont(fntHUDTitle);
+                con.drawString("HERO STATS", 175, intHUD_Y);
+
+                //Draws the health bar based on the player's health stats
+                con.setDrawColor(clrHealth);
+                intBarWitdh = (int)(400.0*(intPlayerHealth/100.0));
+                intBarY = intHUD_Y+90;
+                con.fillRect(82,intBarY,intBarWitdh,31);
+                con.setDrawColor(Color.black);
+                drawRectangleOutline(con,79,intBarY-3,406,36,3);
+                con.drawImage(imgHealth, 30, intBarY-7);
+                con.setDrawColor(Color.white);
+                con.setDrawFont(fntStats);
+                con.drawString(Integer.toString(intPlayerHealth), 500, intBarY-20);
+
+                //Draws the defence bar based on the player's defence stats
+                con.setDrawColor(clrDefence);
+                intBarWitdh = (int)(400.0*(intPlayerDefence/100.0));
+                intBarY = intHUD_Y+150;
+                con.fillRect(82,intBarY,intBarWitdh,31);
+                con.setDrawColor(Color.black);
+                drawRectangleOutline(con,79,intBarY-3,406,36,3);
+                con.drawImage(imgDefence, 30, intBarY-6);
+                con.setDrawColor(Color.white);
+                con.setDrawFont(fntStats);
+                con.drawString(Integer.toString(intPlayerDefence), 500, intBarY-20);
+
+                //Draws the damage bar based on the player's damage stats
+                con.setDrawColor(clrDamage);
+                intBarWitdh = (int)(400.0*(intPlayerDamage/100.0));
+                intBarY = intHUD_Y+210;
+                con.fillRect(82,intBarY,intBarWitdh,31);
+                con.setDrawColor(Color.black);
+                drawRectangleOutline(con,79,intBarY-3,406,36,3);
+                con.drawImage(imgDamage, 30, intBarY-3);
+                con.setDrawColor(Color.white);
+                con.setDrawFont(fntStats);
+                con.drawString(Integer.toString(intPlayerDamage), 500, intBarY-20);
+
+                //Gets ready for the next loop by adding 50 to the y and animates at 30 FPS
+                intHUD_Y += 20;
+                con.sleep(33);
+                con.repaint();
+            }
+
+            //Returns true to set blnHUDActive to true
+            return true;
+
+        //If the HUD is currently active, this runs to pull it up
+        }else{
+            //Sets the HUD to Y initially
+            intHUD_Y = 0;
+
+            //Loops to animate the HUD
+            for(intAnimationLoop = 0; intAnimationLoop <= 600; intAnimationLoop += 20){
+                //Redraws the map and player to get rid of the old HUD frame
+                drawMap(con, intCountColumns, intCountRows, strMap);
+                con.drawImage(imgPlayer, intPlayerX, intPlayerY);
+
+                //Fixes lag issues in the console
+                con.repaint();
+
+                //Draws the HUD background and title
+                con.setDrawColor(clrBackground);
+                con.fillRect(0, intHUD_Y, 600, 300);
+                con.setDrawColor(Color.white);
+                con.setDrawFont(fntHUDTitle);
+                con.drawString("HERO STATS", 175, intHUD_Y);
+
+                //Draws the health bar based on the player's health stats
+                con.setDrawColor(clrHealth);
+                intBarWitdh = (int)(400.0*(intPlayerHealth/100.0));
+                intBarY = intHUD_Y+90;
+                con.fillRect(82,intBarY,intBarWitdh,31);
+                con.setDrawColor(Color.black);
+                drawRectangleOutline(con,79,intBarY-3,406,36,3);
+                con.drawImage(imgHealth, 30, intBarY-7);
+                con.setDrawColor(Color.white);
+                con.setDrawFont(fntStats);
+                con.drawString(Integer.toString(intPlayerHealth), 500, intBarY-20);
+
+                //Draws the defence bar based on the player's defence stats
+                con.setDrawColor(clrDefence);
+                intBarWitdh = (int)(400.0*(intPlayerDefence/100.0));
+                intBarY = intHUD_Y+150;
+                con.fillRect(82,intBarY,intBarWitdh,31);
+                con.setDrawColor(Color.black);
+                drawRectangleOutline(con,79,intBarY-3,406,36,3);
+                con.drawImage(imgDefence, 30, intBarY-6);
+                con.setDrawColor(Color.white);
+                con.setDrawFont(fntStats);
+                con.drawString(Integer.toString(intPlayerDefence), 500, intBarY-20);
+
+                //Draws the damage bar based on the player's damage stats
+                con.setDrawColor(clrDamage);
+                intBarWitdh = (int)(400.0*(intPlayerDamage/100.0));
+                intBarY = intHUD_Y+210;
+                con.fillRect(82,intBarY,intBarWitdh,31);
+                con.setDrawColor(Color.black);
+                drawRectangleOutline(con,79,intBarY-3,406,36,3);
+                con.drawImage(imgDamage, 30, intBarY-3);
+                con.setDrawColor(Color.white);
+                con.setDrawFont(fntStats);
+                con.drawString(Integer.toString(intPlayerDamage), 500, intBarY-20);
+
+                //Gets ready for the next loop by adding 50 to the y and animates at 30 FPS
+                intHUD_Y -= 20;
+                con.sleep(33);
+                con.repaint();
+            }
+
+            //Returns false to set blnHUDActive to false
+            return false;
+        }
     }
 }
