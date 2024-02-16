@@ -1,7 +1,7 @@
 /*
 Soheil Rajabali
-ICS4U1 RPG: The Great RPG
-V1.0
+ICS4U1 RPG: Sus Sus Amogus
+V7.0
 */
 
 import arc.*;

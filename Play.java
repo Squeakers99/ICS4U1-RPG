@@ -1,19 +1,52 @@
+/*
+Soheil Rajabali
+ICS4U1 RPG: Sus Sus Amogus
+V7.0
+*/
+
+/*
+* PERSONAL NOTES
+* Health: Array Position 0
+* Defence: Array Position 1
+* Damage: Array Position 2
+*/
 import arc.*;
 import java.awt.*;
 import java.awt.image.*;
 
 public class Play {
     //Creates variables to be accessible by all methods
-    private static int intPlayerHealth = 50;
-    private static int intPlayerDefence = 70;
-    private static int intPlayerDamage = 60;
+    private static int intPlayerStats[] = new int[3];
+    private static int intEnemy1Stats[] = new int[3];
+    private static int intEnemy2Stats[] = new int[3];
+    private static int intEnemy3Stats[] = new int[3];
+
+    private static String strMap[][] = new String[20][20];
+    private static int intEnemyCount = 0;
+    private static int intEnemiesDefeated = 0;
     private static boolean blnContinue = true;  
 
     //Method to play the game
     public static void Game(Console con, String strMapChoice){
+        //Loads the Stats arrays
+        intPlayerStats[0] = 50;
+        intPlayerStats[1] = 50;
+        intPlayerStats[2] = 50;
+
+        intEnemy1Stats[0] = 10;
+        intEnemy1Stats[1] = 10;
+        intEnemy1Stats[2] = 10;
+
+        intEnemy2Stats[0] = 20;
+        intEnemy2Stats[1] = 20;
+        intEnemy2Stats[2] = 20;
+
+        intEnemy3Stats[0] = 30;
+        intEnemy3Stats[1] = 30;
+        intEnemy3Stats[2] = 30;
+
         //Initializes all Array variables
         String strFileSplit[] = new String[20];
-        String strMap[][] = new String[20][20];
 
         //Initializes all String variables
         String strFileLine;
@@ -51,110 +84,114 @@ public class Play {
         }
 
         //Calls the method to draw the map and draws the player
-        drawMap(con, intCountColumns, intCountRows, strMap);
+        drawMap(con, intCountColumns, intCountRows);
         con.drawImage(imgPlayer, intPlayerCol, intPlayerRow);
         con.repaint();
 
         //Loops to get WASD Player Movement
         while(blnContinue){
             //Gets the current key pressed
-            chrKeyPressed = con.getChar();
+            chrKeyPressed = con.currentChar();
 
             //Tries to run this code for movement
             try{
-                //Check for movement
-                if((chrKeyPressed == 'w')  || (chrKeyPressed == 'a') || (chrKeyPressed == 's') || (chrKeyPressed == 'd') || chrKeyPressed == 'h'){
-                    //If up, this runs
-                    if(chrKeyPressed == 'w'){
-                        strNextBlock = strMap[intPlayerRow - 1][intPlayerCol];
-
-                        //Calls the action method to get the new Y position
-                        intPlayerY = action(con, strNextBlock, chrKeyPressed, intPlayerY, imgPlayer);
-
-                        //Animates Movement
-                        if(intPlayerY != intPlayerRow*30){
-                            intPlayerY += 30;
-                            for(intAnimationLoop = 0; intAnimationLoop < 30; intAnimationLoop += 5){
-                                intPlayerY -= 5;
-                                drawMap(con, intCountColumns, intCountRows, strMap);
-                                con.drawImage(imgPlayer, intPlayerX, intPlayerY);
-                                con.repaint();
-                                con.sleep(33);
-                            }
-                        }
-
-                        intPlayerRow = intPlayerY/30;
-
-                    //If down, this runs
-                    }else if(chrKeyPressed == 's'){
-                        strNextBlock = strMap[intPlayerRow + 1][intPlayerCol];
-
-                        //Calls the action method to get the new Y position
-                        intPlayerY = action(con, strNextBlock, chrKeyPressed, intPlayerY, imgPlayer);
-
-                        //Animates Movement
-                        if(intPlayerY != intPlayerRow*30){
-                            intPlayerY -= 30;
-                            for(intAnimationLoop = 0; intAnimationLoop < 30; intAnimationLoop += 5){
-                                intPlayerY += 5;
-                                drawMap(con, intCountColumns, intCountRows, strMap);
-                                con.drawImage(imgPlayer, intPlayerX, intPlayerY);
-                                con.repaint();
-                                con.sleep(33);
-                            }
-                        }
-
-                        intPlayerRow = intPlayerY/30;
-
-                    //If left, this runs
-                    }else if(chrKeyPressed == 'a'){
-                        strNextBlock = strMap[intPlayerRow][intPlayerCol - 1];
-
-                        //Calls the action method to get the new X position
-                        intPlayerX = action(con, strNextBlock, chrKeyPressed, intPlayerX, imgPlayer);
-
-                        //Animates Movement
-                        if(intPlayerX != intPlayerCol*30){
-                            intPlayerX += 30;
-                            for(intAnimationLoop = 0; intAnimationLoop < 30; intAnimationLoop += 5){
-                                intPlayerX -= 5;
-                                drawMap(con, intCountColumns, intCountRows, strMap);
-                                con.drawImage(imgPlayer, intPlayerX, intPlayerY);
-                                con.repaint();
-                                con.sleep(33);
-                            }
-                        }
-
-                        intPlayerCol = intPlayerX/30;
-                    
-                    //If right, this runs
-                    }else if(chrKeyPressed == 'd'){
-                        strNextBlock = strMap[intPlayerRow][intPlayerCol + 1];
-                        
-                        //Calls the action method to get the new X position
-                        intPlayerX = action(con, strNextBlock, chrKeyPressed, intPlayerX, imgPlayer);
-
-                        //Animates Movement
-                        if(intPlayerX != intPlayerCol*30){
-                            intPlayerX -= 30;
-                            for(intAnimationLoop = 0; intAnimationLoop < 30; intAnimationLoop += 5){
-                                intPlayerX += 5;
-                                drawMap(con, intCountColumns, intCountRows, strMap);
-                                con.drawImage(imgPlayer, intPlayerX, intPlayerY);
-                                con.repaint();
-                                con.sleep(33);
-                            }
-                        }
-
-                        intPlayerCol = intPlayerX/30;
-
-                    //HUD bar to display the player's stats (health, defence, and damage)
-                    }else if(chrKeyPressed == 'h'){
-                        blnHUDActive = HUD_Display(con, blnHUDActive, intAnimationLoop, imgPlayer, intPlayerX, intPlayerY, intCountColumns, intCountRows, strMap);
-                    }
+                //Triggers or retracts the HUD
+                if(chrKeyPressed == 'h'){
+                    blnHUDActive = HUD_Display(con, blnHUDActive, intAnimationLoop, imgPlayer, intPlayerX, intPlayerY, intCountColumns, intCountRows);
                 }
-                //Redraws the console
-                con.repaint();
+
+                //Only moves character if HUD is inactive
+                if(!blnHUDActive){
+                    //Check for movement
+                    if((chrKeyPressed == 'w')  || (chrKeyPressed == 'a') || (chrKeyPressed == 's') || (chrKeyPressed == 'd')){
+                        //If up, this runs
+                        if(chrKeyPressed == 'w'){
+                            strNextBlock = strMap[intPlayerRow - 1][intPlayerCol];
+
+                            //Calls the action method to get the new Y position
+                            intPlayerY = action(con, strNextBlock, chrKeyPressed, intPlayerY, imgPlayer, intAnimationLoop);
+
+                            //Animates Movement
+                            if(intPlayerY != intPlayerRow*30){
+                                intPlayerY += 30;
+                                for(intAnimationLoop = 0; intAnimationLoop < 30; intAnimationLoop += 5){
+                                    intPlayerY -= 5;
+                                    drawMap(con, intCountColumns, intCountRows);
+                                    con.drawImage(imgPlayer, intPlayerX, intPlayerY);
+                                    con.repaint();
+                                    con.sleep(33);
+                                }
+                            }
+
+                            intPlayerRow = intPlayerY/30;
+
+                        //If down, this runs
+                        }else if(chrKeyPressed == 's'){
+                            strNextBlock = strMap[intPlayerRow + 1][intPlayerCol];
+
+                            //Calls the action method to get the new Y position
+                            intPlayerY = action(con, strNextBlock, chrKeyPressed, intPlayerY, imgPlayer, intAnimationLoop);
+
+                            //Animates Movement
+                            if(intPlayerY != intPlayerRow*30){
+                                intPlayerY -= 30;
+                                for(intAnimationLoop = 0; intAnimationLoop < 30; intAnimationLoop += 5){
+                                    intPlayerY += 5;
+                                    drawMap(con, intCountColumns, intCountRows);
+                                    con.drawImage(imgPlayer, intPlayerX, intPlayerY);
+                                    con.repaint();
+                                    con.sleep(33);
+                                }
+                            }
+
+                            intPlayerRow = intPlayerY/30;
+
+                        //If left, this runs
+                        }else if(chrKeyPressed == 'a'){
+                            strNextBlock = strMap[intPlayerRow][intPlayerCol - 1];
+
+                            //Calls the action method to get the new X position
+                            intPlayerX = action(con, strNextBlock, chrKeyPressed, intPlayerX, imgPlayer, intAnimationLoop);
+
+                            //Animates Movement
+                            if(intPlayerX != intPlayerCol*30){
+                                intPlayerX += 30;
+                                for(intAnimationLoop = 0; intAnimationLoop < 30; intAnimationLoop += 5){
+                                    intPlayerX -= 5;
+                                    drawMap(con, intCountColumns, intCountRows);
+                                    con.drawImage(imgPlayer, intPlayerX, intPlayerY);
+                                    con.repaint();
+                                    con.sleep(33);
+                                }
+                            }
+
+                            intPlayerCol = intPlayerX/30;
+                        
+                        //If right, this runs
+                        }else if(chrKeyPressed == 'd'){
+                            strNextBlock = strMap[intPlayerRow][intPlayerCol + 1];
+                            
+                            //Calls the action method to get the new X position
+                            intPlayerX = action(con, strNextBlock, chrKeyPressed, intPlayerX, imgPlayer, intAnimationLoop);
+
+                            //Animates Movement
+                            if(intPlayerX != intPlayerCol*30){
+                                intPlayerX -= 30;
+                                for(intAnimationLoop = 0; intAnimationLoop < 30; intAnimationLoop += 5){
+                                    intPlayerX += 5;
+                                    drawMap(con, intCountColumns, intCountRows);
+                                    con.drawImage(imgPlayer, intPlayerX, intPlayerY);
+                                    con.repaint();
+                                    con.sleep(33);
+                                }
+                            }
+
+                            intPlayerCol = intPlayerX/30;
+                        }
+                    }
+                    //Redraws the console
+                    con.repaint();
+                }
             
             //If an array error is caught, the player cannot go there because it is outside the map. It does nothing
             }catch(Exception ArrayIndexOutOfBounds){}
@@ -177,7 +214,7 @@ public class Play {
     }
 
     //Method to draw the map
-    public static void drawMap(Console con, int intCountColumns, int intCountRows, String strMap[][]){
+    public static void drawMap(Console con, int intCountColumns, int intCountRows){
         //String Variable Initialization
         String strBlock;
         
@@ -198,7 +235,7 @@ public class Play {
         for(intCountRows = 0; intCountRows < 20; intCountRows++){
             for(intCountColumns = 0; intCountColumns < 20; intCountColumns++){
                 strBlock = strMap[intCountRows][intCountColumns];
-                if(strBlock.equals("g")){
+                if(strBlock.equals("g") || (strBlock.equals("d") || strBlock.equals("s"))){
                     con.drawImage(imgGrass, intBlockX, intBlockY);
                 }else if(strBlock.equals("w")){
                     con.drawImage(imgWater, intBlockX, intBlockY);
@@ -208,10 +245,13 @@ public class Play {
                     con.drawImage(imgBuilding, intBlockX, intBlockY);
                 }else if(strBlock.equals("e1")){
                     con.drawImage(imgEnemy1, intBlockX, intBlockY);
+                    intEnemyCount++;
                 }else if(strBlock.equals("e2")){
                     con.drawImage(imgEnemy2, intBlockX, intBlockY);
+                    intEnemyCount++;
                 }else if(strBlock.equals("e3")){
                     con.drawImage(imgEnemy3, intBlockX, intBlockY);
+                    intEnemyCount++;
                 }
                 intBlockX += 30;
             }
@@ -222,27 +262,34 @@ public class Play {
     }
 
     //Method for action logic
-    public static int action(Console con, String strNextBlock, char chrKeyPressed, int intPlayerMovement, BufferedImage imgPlayer){
+    public static int action(Console con, String strNextBlock, char chrKeyPressed, int intPlayerMovement, BufferedImage imgPlayer, int intAnimationLoop){
         //Loads in the Drowned Image
         BufferedImage imgDrowned = con.loadImage("Images/Other/Drowned.png");
         
         //Checks for Water on next block
         if(strNextBlock.equals("w")){
-            con.drawImage(imgDrowned, 0, 0);
+            
+            //Slide Animation
+            for(intAnimationLoop=600; intAnimationLoop >= 0; intAnimationLoop -= 15){
+                con.drawImage(imgDrowned, intAnimationLoop, 0);
+                con.repaint();
+                con.sleep(33);
+            }
+
             blnContinue = false;
 
         //Checks for Building on the next block
         }else if(strNextBlock.equals("b")){
-            if(intPlayerHealth < 100){
-                intPlayerHealth += 10;
+            if(intPlayerStats[0] < 100){
+                intPlayerStats[0] += 10;
             }else{
                 //Something here saying health maxed
             }
 
         //Checks for Enemies on the next block
         }else if(strNextBlock.equals("e1") || strNextBlock.equals("e2") || strNextBlock.equals("e3")){
-            if(intPlayerHealth > 0){
-                intPlayerHealth -= 10;
+            if(intPlayerStats[0] > 0){
+                intPlayerStats[0] -= 10;
             }
         }
 
@@ -263,7 +310,7 @@ public class Play {
     }
 
     //Method to either display or hide the HUD bar with an animation
-    public static boolean HUD_Display(Console con, boolean blnHUDActive, int intAnimationLoop, BufferedImage imgPlayer, int intPlayerX, int intPlayerY, int intCountColumns, int intCountRows, String strMap[][]){
+    public static boolean HUD_Display(Console con, boolean blnHUDActive, int intAnimationLoop, BufferedImage imgPlayer, int intPlayerX, int intPlayerY, int intCountColumns, int intCountRows){
         //Loads in the font for the display
         Font fntHUDTitle = con.loadFont("Fonts/HUD Title.ttf", 50);
         Font fntStats = con.loadFont("Fonts/Stats font.ttf",40);
@@ -292,7 +339,7 @@ public class Play {
             //Animates the HUD
             for(intAnimationLoop = 0; intAnimationLoop <= 300; intAnimationLoop += 20){
                 //Redraws the map and player to get rid of the old HUD frame
-                drawMap(con, intCountColumns, intCountRows, strMap);
+                drawMap(con, intCountColumns, intCountRows);
                 con.drawImage(imgPlayer, intPlayerX, intPlayerY);
 
                 //Fixes lag issues in the console
@@ -307,7 +354,7 @@ public class Play {
 
                 //Draws the health bar based on the player's health stats
                 con.setDrawColor(clrHealth);
-                intBarWitdh = (int)(400.0*(intPlayerHealth/100.0));
+                intBarWitdh = (int)(400.0*(intPlayerStats[0]/100.0));
                 intBarY = intHUD_Y+90;
                 con.fillRect(82,intBarY,intBarWitdh,31);
                 con.setDrawColor(Color.black);
@@ -315,11 +362,11 @@ public class Play {
                 con.drawImage(imgHealth, 30, intBarY-7);
                 con.setDrawColor(Color.white);
                 con.setDrawFont(fntStats);
-                con.drawString(Integer.toString(intPlayerHealth), 500, intBarY-20);
+                con.drawString(Integer.toString(intPlayerStats[0]), 500, intBarY-20);
 
                 //Draws the defence bar based on the player's defence stats
                 con.setDrawColor(clrDefence);
-                intBarWitdh = (int)(400.0*(intPlayerDefence/100.0));
+                intBarWitdh = (int)(400.0*(intPlayerStats[1]/100.0));
                 intBarY = intHUD_Y+150;
                 con.fillRect(82,intBarY,intBarWitdh,31);
                 con.setDrawColor(Color.black);
@@ -327,11 +374,11 @@ public class Play {
                 con.drawImage(imgDefence, 30, intBarY-6);
                 con.setDrawColor(Color.white);
                 con.setDrawFont(fntStats);
-                con.drawString(Integer.toString(intPlayerDefence), 500, intBarY-20);
+                con.drawString(Integer.toString(intPlayerStats[1]), 500, intBarY-20);
 
                 //Draws the damage bar based on the player's damage stats
                 con.setDrawColor(clrDamage);
-                intBarWitdh = (int)(400.0*(intPlayerDamage/100.0));
+                intBarWitdh = (int)(400.0*(intPlayerStats[2]/100.0));
                 intBarY = intHUD_Y+210;
                 con.fillRect(82,intBarY,intBarWitdh,31);
                 con.setDrawColor(Color.black);
@@ -339,7 +386,7 @@ public class Play {
                 con.drawImage(imgDamage, 30, intBarY-3);
                 con.setDrawColor(Color.white);
                 con.setDrawFont(fntStats);
-                con.drawString(Integer.toString(intPlayerDamage), 500, intBarY-20);
+                con.drawString(Integer.toString(intPlayerStats[2]), 500, intBarY-20);
 
                 //Gets ready for the next loop by adding 50 to the y and animates at 30 FPS
                 intHUD_Y += 20;
@@ -358,7 +405,7 @@ public class Play {
             //Loops to animate the HUD
             for(intAnimationLoop = 0; intAnimationLoop <= 600; intAnimationLoop += 20){
                 //Redraws the map and player to get rid of the old HUD frame
-                drawMap(con, intCountColumns, intCountRows, strMap);
+                drawMap(con, intCountColumns, intCountRows);
                 con.drawImage(imgPlayer, intPlayerX, intPlayerY);
 
                 //Fixes lag issues in the console
@@ -373,7 +420,7 @@ public class Play {
 
                 //Draws the health bar based on the player's health stats
                 con.setDrawColor(clrHealth);
-                intBarWitdh = (int)(400.0*(intPlayerHealth/100.0));
+                intBarWitdh = (int)(400.0*(intPlayerStats[0]/100.0));
                 intBarY = intHUD_Y+90;
                 con.fillRect(82,intBarY,intBarWitdh,31);
                 con.setDrawColor(Color.black);
@@ -381,11 +428,11 @@ public class Play {
                 con.drawImage(imgHealth, 30, intBarY-7);
                 con.setDrawColor(Color.white);
                 con.setDrawFont(fntStats);
-                con.drawString(Integer.toString(intPlayerHealth), 500, intBarY-20);
+                con.drawString(Integer.toString(intPlayerStats[0]), 500, intBarY-20);
 
                 //Draws the defence bar based on the player's defence stats
                 con.setDrawColor(clrDefence);
-                intBarWitdh = (int)(400.0*(intPlayerDefence/100.0));
+                intBarWitdh = (int)(400.0*(intPlayerStats[1]/100.0));
                 intBarY = intHUD_Y+150;
                 con.fillRect(82,intBarY,intBarWitdh,31);
                 con.setDrawColor(Color.black);
@@ -393,11 +440,11 @@ public class Play {
                 con.drawImage(imgDefence, 30, intBarY-6);
                 con.setDrawColor(Color.white);
                 con.setDrawFont(fntStats);
-                con.drawString(Integer.toString(intPlayerDefence), 500, intBarY-20);
+                con.drawString(Integer.toString(intPlayerStats[1]), 500, intBarY-20);
 
                 //Draws the damage bar based on the player's damage stats
                 con.setDrawColor(clrDamage);
-                intBarWitdh = (int)(400.0*(intPlayerDamage/100.0));
+                intBarWitdh = (int)(400.0*(intPlayerStats[2]/100.0));
                 intBarY = intHUD_Y+210;
                 con.fillRect(82,intBarY,intBarWitdh,31);
                 con.setDrawColor(Color.black);
@@ -405,7 +452,7 @@ public class Play {
                 con.drawImage(imgDamage, 30, intBarY-3);
                 con.setDrawColor(Color.white);
                 con.setDrawFont(fntStats);
-                con.drawString(Integer.toString(intPlayerDamage), 500, intBarY-20);
+                con.drawString(Integer.toString(intPlayerStats[2]), 500, intBarY-20);
 
                 //Gets ready for the next loop by adding 50 to the y and animates at 30 FPS
                 intHUD_Y -= 20;
