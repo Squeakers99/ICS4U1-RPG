@@ -50,7 +50,7 @@ public class Play {
 
         //Initializes all String variables
         String strFileLine;
-        String strNextBlock;
+        String strNextBlock = "";
 
         //Initializes all Integer variables
         int intCountRows = 0;
@@ -71,8 +71,9 @@ public class Play {
         //Initializes the chosen map
         TextInputFile txtMap = new TextInputFile("Maps/" + strMapChoice + ".csv");
 
-        //Initializes all pictures required for play
+        //Initializes all pictures
         BufferedImage imgPlayer = con.loadImage("Images/Avatars/Player.png");
+        BufferedImage imgDrowned = con.loadImage("Images/Other/Drowned.png");
 
         //Loads the array with the chosen map
         for(intCountRows = 0; intCountRows < 20; intCountRows++){
@@ -109,7 +110,7 @@ public class Play {
                             strNextBlock = strMap[intPlayerRow - 1][intPlayerCol];
 
                             //Calls the action method to get the new Y position
-                            intPlayerY = action(con, strNextBlock, chrKeyPressed, intPlayerY, imgPlayer, intAnimationLoop);
+                            intPlayerY = action(con, strNextBlock, chrKeyPressed, intPlayerY, imgPlayer, intAnimationLoop, intPlayerRow-1, intPlayerCol);
 
                             //Animates Movement
                             if(intPlayerY != intPlayerRow*30){
@@ -130,7 +131,7 @@ public class Play {
                             strNextBlock = strMap[intPlayerRow + 1][intPlayerCol];
 
                             //Calls the action method to get the new Y position
-                            intPlayerY = action(con, strNextBlock, chrKeyPressed, intPlayerY, imgPlayer, intAnimationLoop);
+                            intPlayerY = action(con, strNextBlock, chrKeyPressed, intPlayerY, imgPlayer, intAnimationLoop, intPlayerRow+1, intPlayerCol);
 
                             //Animates Movement
                             if(intPlayerY != intPlayerRow*30){
@@ -151,7 +152,7 @@ public class Play {
                             strNextBlock = strMap[intPlayerRow][intPlayerCol - 1];
 
                             //Calls the action method to get the new X position
-                            intPlayerX = action(con, strNextBlock, chrKeyPressed, intPlayerX, imgPlayer, intAnimationLoop);
+                            intPlayerX = action(con, strNextBlock, chrKeyPressed, intPlayerX, imgPlayer, intAnimationLoop, intPlayerRow, intPlayerCol-1);
 
                             //Animates Movement
                             if(intPlayerX != intPlayerCol*30){
@@ -172,7 +173,7 @@ public class Play {
                             strNextBlock = strMap[intPlayerRow][intPlayerCol + 1];
                             
                             //Calls the action method to get the new X position
-                            intPlayerX = action(con, strNextBlock, chrKeyPressed, intPlayerX, imgPlayer, intAnimationLoop);
+                            intPlayerX = action(con, strNextBlock, chrKeyPressed, intPlayerX, imgPlayer, intAnimationLoop, intPlayerRow, intPlayerCol+1);
 
                             //Animates Movement
                             if(intPlayerX != intPlayerCol*30){
@@ -189,6 +190,22 @@ public class Play {
                             intPlayerCol = intPlayerX/30;
                         }
                     }
+                    //Draws the drowned screen if they drowned after player is animated
+                    if(strNextBlock.equals("w")){
+                        //Sleeps the console so the player is seen in the water
+                        con.sleep(100);
+
+                        //Slide Animation
+                        for (intAnimationLoop = 600; intAnimationLoop >= 0; intAnimationLoop -= 15) {
+                            con.drawImage(imgDrowned, intAnimationLoop, 0);
+                            con.repaint();
+                            con.sleep(1000/60);
+                        }
+
+                        //Will not loop again
+                        blnContinue = false;
+                    }
+
                     //Redraws the console
                     con.repaint();
                 }
@@ -262,30 +279,29 @@ public class Play {
     }
 
     //Method for action logic
-    public static int action(Console con, String strNextBlock, char chrKeyPressed, int intPlayerMovement, BufferedImage imgPlayer, int intAnimationLoop){
-        //Loads in the Drowned Image
-        BufferedImage imgDrowned = con.loadImage("Images/Other/Drowned.png");
-        
-        //Checks for Water on next block
-        if(strNextBlock.equals("w")){
-            
-            //Slide Animation
-            for(intAnimationLoop=600; intAnimationLoop >= 0; intAnimationLoop -= 15){
-                con.drawImage(imgDrowned, intAnimationLoop, 0);
-                con.repaint();
-                con.sleep(33);
-            }
-
-            blnContinue = false;
-
+    public static int action(Console con, String strNextBlock, char chrKeyPressed, int intPlayerMovement, BufferedImage imgPlayer, int intAnimationLoop, int intPlayerRequestedRow, int intPlayerRequestedCol){
+        System.out.println(strNextBlock);
         //Checks for Building on the next block
-        }else if(strNextBlock.equals("b")){
+        if(strNextBlock.equals("b")){
             if(intPlayerStats[0] < 100){
                 intPlayerStats[0] += 10;
-            }else{
-                //Something here saying health maxed
             }
-
+        
+        //Checks if the next block is a defence boost
+        }else if(strNextBlock.equals("s")){
+            //Adds 10 to the player's defence and replaces the block with grass
+            if(intPlayerStats[1] < 100){
+                intPlayerStats[1] += 10;
+                strMap[intPlayerRequestedRow][intPlayerRequestedCol] = "g";
+            }
+        //Checks if the next block is a damage boost
+        }else if(strNextBlock.equals("d")){
+            //Adds 10 to the player's damage and replaces the block with grass
+            if(intPlayerStats[2] < 100){
+                intPlayerStats[2] += 10;
+                strMap[intPlayerRequestedRow][intPlayerRequestedCol] = "g";
+            }
+        
         //Checks for Enemies on the next block
         }else if(strNextBlock.equals("e1") || strNextBlock.equals("e2") || strNextBlock.equals("e3")){
             if(intPlayerStats[0] > 0){
@@ -294,7 +310,7 @@ public class Play {
         }
 
         //If the next block is anything but a tree, this will run
-        if(!strNextBlock.equals("t") && !strNextBlock.equals("w")){
+        if(!strNextBlock.equals("t")){
             //Moves row/column minus one if its 'w' or 'a'
             if(chrKeyPressed == 'w' || chrKeyPressed == 'a'){
                 intPlayerMovement -= 30;

@@ -11,7 +11,7 @@ import java.awt.image.*;
 public class RPG_Game{
     public static void main(String[] args){
         //Initializes the console
-        Console con = new Console("The Great RPG", 600,600);
+        Console con = new Console("Sus Sus Amogus: The Game", 600, 600);
 
         //Initializes string variables
         String strChoice;
