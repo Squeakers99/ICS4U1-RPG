@@ -22,7 +22,7 @@ public class Play {
     private static int intEnemy3Stats[] = new int[3];
 
     private static String strMap[][] = new String[20][20];
-    private static int intEnemyCount = 0;
+    private static int intEnemyCount;
     private static int intEnemiesDefeated = 0;
     private static boolean blnContinue = true;  
 
@@ -74,6 +74,8 @@ public class Play {
         //Initializes all pictures
         BufferedImage imgPlayer = con.loadImage("Images/Avatars/Player.png");
         BufferedImage imgDrowned = con.loadImage("Images/Other/Drowned.png");
+        BufferedImage imgDeath = con.loadImage("Images/Other/Death.png");
+        BufferedImage imgPlayerDeath = con.loadImage("Images/Other/Player (Death Animation).png");
 
         //Loads the array with the chosen map
         for(intCountRows = 0; intCountRows < 20; intCountRows++){
@@ -110,7 +112,7 @@ public class Play {
                             strNextBlock = strMap[intPlayerRow - 1][intPlayerCol];
 
                             //Calls the action method to get the new Y position
-                            intPlayerY = action(con, strNextBlock, chrKeyPressed, intPlayerY, imgPlayer, intAnimationLoop, intPlayerRow-1, intPlayerCol);
+                            intPlayerY = action(strNextBlock, chrKeyPressed, intPlayerY, imgPlayer, intAnimationLoop, intPlayerRow-1, intPlayerCol);
 
                             //Animates Movement
                             if(intPlayerY != intPlayerRow*30){
@@ -131,7 +133,7 @@ public class Play {
                             strNextBlock = strMap[intPlayerRow + 1][intPlayerCol];
 
                             //Calls the action method to get the new Y position
-                            intPlayerY = action(con, strNextBlock, chrKeyPressed, intPlayerY, imgPlayer, intAnimationLoop, intPlayerRow+1, intPlayerCol);
+                            intPlayerY = action(strNextBlock, chrKeyPressed, intPlayerY, imgPlayer, intAnimationLoop, intPlayerRow+1, intPlayerCol);
 
                             //Animates Movement
                             if(intPlayerY != intPlayerRow*30){
@@ -152,7 +154,7 @@ public class Play {
                             strNextBlock = strMap[intPlayerRow][intPlayerCol - 1];
 
                             //Calls the action method to get the new X position
-                            intPlayerX = action(con, strNextBlock, chrKeyPressed, intPlayerX, imgPlayer, intAnimationLoop, intPlayerRow, intPlayerCol-1);
+                            intPlayerX = action(strNextBlock, chrKeyPressed, intPlayerX, imgPlayer, intAnimationLoop, intPlayerRow, intPlayerCol-1);
 
                             //Animates Movement
                             if(intPlayerX != intPlayerCol*30){
@@ -173,7 +175,7 @@ public class Play {
                             strNextBlock = strMap[intPlayerRow][intPlayerCol + 1];
                             
                             //Calls the action method to get the new X position
-                            intPlayerX = action(con, strNextBlock, chrKeyPressed, intPlayerX, imgPlayer, intAnimationLoop, intPlayerRow, intPlayerCol+1);
+                            intPlayerX = action(strNextBlock, chrKeyPressed, intPlayerX, imgPlayer, intAnimationLoop, intPlayerRow, intPlayerCol+1);
 
                             //Animates Movement
                             if(intPlayerX != intPlayerCol*30){
@@ -190,6 +192,7 @@ public class Play {
                             intPlayerCol = intPlayerX/30;
                         }
                     }
+
                     //Draws the drowned screen if they drowned after player is animated
                     if(strNextBlock.equals("w")){
                         //Sleeps the console so the player is seen in the water
@@ -199,11 +202,33 @@ public class Play {
                         for (intAnimationLoop = 600; intAnimationLoop >= 0; intAnimationLoop -= 15) {
                             con.drawImage(imgDrowned, intAnimationLoop, 0);
                             con.repaint();
-                            con.sleep(1000/60);
+                            con.sleep(16);
                         }
 
                         //Will not loop again
                         blnContinue = false;
+                    }
+
+                    //Checks if the player's health is below 0
+                    if(intPlayerStats[0] < 0){
+                        for (intAnimationLoop = -600; intAnimationLoop <= 0; intAnimationLoop += 15) {
+                            con.drawImage(imgDeath, intAnimationLoop, 0);
+                            con.repaint();
+                            con.sleep(16);
+                        }
+                        con.sleep(500);
+                        for (intAnimationLoop = -150; intAnimationLoop <= 600; intAnimationLoop += 50){
+                            con.drawImage(imgDeath, 0, 0);
+                            con.drawImage(imgPlayerDeath, intAnimationLoop, 175);
+                            con.repaint();
+                            con.sleep(33);
+                        }
+                        blnContinue = false;
+                    }
+
+                    //Checks if the player beat all the enemies
+                    if(intEnemiesDefeated == intEnemyCount){
+                        //Win Code here
                     }
 
                     //Redraws the console
@@ -232,12 +257,14 @@ public class Play {
 
     //Method to draw the map
     public static void drawMap(Console con, int intCountColumns, int intCountRows){
+        
         //String Variable Initialization
         String strBlock;
         
         //Integer Variables Initialization
         int intBlockX = 0;
         int intBlockY = 0;
+        intEnemyCount = 0;
 
         //Blocks and Enemies Image Loading
         BufferedImage imgWater = con.loadImage("Images/Blocks/Water.png");
@@ -279,34 +306,55 @@ public class Play {
     }
 
     //Method for action logic
-    public static int action(Console con, String strNextBlock, char chrKeyPressed, int intPlayerMovement, BufferedImage imgPlayer, int intAnimationLoop, int intPlayerRequestedRow, int intPlayerRequestedCol){
-        System.out.println(strNextBlock);
+    public static int action(String strNextBlock, char chrKeyPressed, int intPlayerMovement, BufferedImage imgPlayer, int intAnimationLoop, int intPlayerRequestedRow, int intPlayerRequestedCol){
+        //Creates a variable to see how much health lost (if any)
+        int intHealthLost = 0;
+        
         //Checks for Building on the next block
-        if(strNextBlock.equals("b")){
-            if(intPlayerStats[0] < 100){
-                intPlayerStats[0] += 10;
+        if(strNextBlock.equals("b") && intPlayerStats[0] < 100){
+            intPlayerStats[0] += 10;
+            if(intPlayerStats[0] > 100){
+                intPlayerStats[0] = 100;
             }
+            strMap[intPlayerRequestedRow][intPlayerRequestedCol] = "g";
         
         //Checks if the next block is a defence boost
-        }else if(strNextBlock.equals("s")){
+        }else if(strNextBlock.equals("s") && intPlayerStats[1] < 100 && intPlayerStats[1] > 0){
             //Adds 10 to the player's defence and replaces the block with grass
-            if(intPlayerStats[1] < 100){
-                intPlayerStats[1] += 10;
-                strMap[intPlayerRequestedRow][intPlayerRequestedCol] = "g";
-            }
+            intPlayerStats[1] += 10;
+            strMap[intPlayerRequestedRow][intPlayerRequestedCol] = "g";
+
         //Checks if the next block is a damage boost
-        }else if(strNextBlock.equals("d")){
+        }else if(strNextBlock.equals("d") && intPlayerStats[2] < 100 && intPlayerStats[2] > 0){
             //Adds 10 to the player's damage and replaces the block with grass
-            if(intPlayerStats[2] < 100){
-                intPlayerStats[2] += 10;
-                strMap[intPlayerRequestedRow][intPlayerRequestedCol] = "g";
-            }
+            intPlayerStats[2] += 10;
+            strMap[intPlayerRequestedRow][intPlayerRequestedCol] = "g";
         
-        //Checks for Enemies on the next block
-        }else if(strNextBlock.equals("e1") || strNextBlock.equals("e2") || strNextBlock.equals("e3")){
-            if(intPlayerStats[0] > 0){
-                intPlayerStats[0] -= 10;
+        //Checks if enemy 1 is on the next block
+        }else if(strNextBlock.equals("e1") && intPlayerStats[0] > 0){
+            //Enemy 1 Battle logic
+            intHealthLost = (int)(intEnemy1Stats[2] - ((intPlayerStats[1]/100.0) * intEnemy1Stats[2]));
+
+        //Checks if enemy 2 is on the next block
+        }else if(strNextBlock.equals("e2") && intPlayerStats[0] > 0){
+            //Enemy 2 Battle logic
+            intHealthLost = (int)(intEnemy2Stats[2] - ((intPlayerStats[1]/100.0) * intEnemy2Stats[2]));
+
+        //Checks if enemy 3 is on the next block
+        }else if(strNextBlock.equals("e3") && intPlayerStats[0] > 0){
+            //Enemy 3 Battle logic
+            intHealthLost = (int)(intEnemy3Stats[2] - ((intPlayerStats[1]/100.0) * intEnemy3Stats[2]));
+        }
+
+        //If it is any of the 3 enemy blocks, this code runs
+        if((strNextBlock.equals("e1") || strNextBlock.equals("e2") || strNextBlock.equals("e3")) && intPlayerStats[0] > 0){
+            //General code for all the enemy blocks
+            intPlayerStats[0] -= intHealthLost;
+            if(intPlayerStats[1] > 0){
+                intPlayerStats[1] -= 10;
             }
+            strMap[intPlayerRequestedRow][intPlayerRequestedCol] = "g";
+            intEnemiesDefeated += 1;
         }
 
         //If the next block is anything but a tree, this will run

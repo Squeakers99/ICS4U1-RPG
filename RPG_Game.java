@@ -16,9 +16,9 @@ public class RPG_Game{
         //Initializes string variables
         String strChoice;
 
-        boolean boolPlay = false;
+        boolean blnPlay = false;
 
-        while(!boolPlay){
+        while(!blnPlay){
             strChoice = GameMenu(con);
             
             if(strChoice.equals("Select Map")){
@@ -28,7 +28,7 @@ public class RPG_Game{
             }else if(strChoice.equals("Quit")){
                 con.closeConsole();
             }else{
-                boolPlay = true;
+                blnPlay = true;
             }
         }
 
