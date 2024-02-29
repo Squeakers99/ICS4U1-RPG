@@ -10,6 +10,7 @@ V7.0
 * Defence: Array Position 1
 * Damage: Array Position 2
 */
+
 import arc.*;
 import java.awt.*;
 import java.awt.image.*;
@@ -33,17 +34,17 @@ public class Play {
         intPlayerStats[1] = 50;
         intPlayerStats[2] = 50;
 
-        intEnemy1Stats[0] = 10;
-        intEnemy1Stats[1] = 10;
-        intEnemy1Stats[2] = 10;
+        intEnemy1Stats[0] = 20;
+        intEnemy1Stats[1] = 20;
+        intEnemy1Stats[2] = 20;
 
-        intEnemy2Stats[0] = 20;
-        intEnemy2Stats[1] = 20;
-        intEnemy2Stats[2] = 20;
+        intEnemy2Stats[0] = 30;
+        intEnemy2Stats[1] = 30;
+        intEnemy2Stats[2] = 30;
 
-        intEnemy3Stats[0] = 30;
-        intEnemy3Stats[1] = 30;
-        intEnemy3Stats[2] = 30;
+        intEnemy3Stats[0] = 40;
+        intEnemy3Stats[1] = 40;
+        intEnemy3Stats[2] = 40;
 
         //Initializes all Array variables
         String strFileSplit[] = new String[20];
@@ -88,8 +89,11 @@ public class Play {
 
         //Calls the method to draw the map and draws the player
         drawMap(con, intCountColumns, intCountRows);
-        con.drawImage(imgPlayer, intPlayerCol, intPlayerRow);
+        //con.drawImage(imgPlayer, intPlayerCol, intPlayerRow);
         con.repaint();
+
+        //Tells me how many enemies there are
+        System.out.println("Enemy Count: " + intEnemyCount);
 
         //Loops to get WASD Player Movement
         while(blnContinue){
@@ -122,7 +126,7 @@ public class Play {
                                     drawMap(con, intCountColumns, intCountRows);
                                     con.drawImage(imgPlayer, intPlayerX, intPlayerY);
                                     con.repaint();
-                                    con.sleep(33);
+                                    con.sleep(16);
                                 }
                             }
 
@@ -143,7 +147,7 @@ public class Play {
                                     drawMap(con, intCountColumns, intCountRows);
                                     con.drawImage(imgPlayer, intPlayerX, intPlayerY);
                                     con.repaint();
-                                    con.sleep(33);
+                                    con.sleep(16);
                                 }
                             }
 
@@ -164,7 +168,7 @@ public class Play {
                                     drawMap(con, intCountColumns, intCountRows);
                                     con.drawImage(imgPlayer, intPlayerX, intPlayerY);
                                     con.repaint();
-                                    con.sleep(33);
+                                    con.sleep(16);
                                 }
                             }
 
@@ -185,7 +189,7 @@ public class Play {
                                     drawMap(con, intCountColumns, intCountRows);
                                     con.drawImage(imgPlayer, intPlayerX, intPlayerY);
                                     con.repaint();
-                                    con.sleep(33);
+                                    con.sleep(16);
                                 }
                             }
 
@@ -209,8 +213,8 @@ public class Play {
                         blnContinue = false;
                     }
 
-                    //Checks if the player's health is below 0
-                    if(intPlayerStats[0] < 0){
+                    //Checks if the player's health is below or equal to 0
+                    if(intPlayerStats[0] <= 0){
                         for (intAnimationLoop = -600; intAnimationLoop <= 0; intAnimationLoop += 15) {
                             con.drawImage(imgDeath, intAnimationLoop, 0);
                             con.repaint();
@@ -221,7 +225,7 @@ public class Play {
                             con.drawImage(imgDeath, 0, 0);
                             con.drawImage(imgPlayerDeath, intAnimationLoop, 175);
                             con.repaint();
-                            con.sleep(33);
+                            con.sleep(16);
                         }
                         blnContinue = false;
                     }
@@ -231,7 +235,8 @@ public class Play {
                         //Win Code here
                     }
 
-                    //Redraws the console
+                    //Redraws the console and delays to prevent multiple inputs
+                    con.sleep(100);
                     con.repaint();
                 }
             
@@ -351,7 +356,7 @@ public class Play {
             //General code for all the enemy blocks
             intPlayerStats[0] -= intHealthLost;
             if(intPlayerStats[1] > 0){
-                intPlayerStats[1] -= 10;
+                intPlayerStats[1] -= 5;
             }
             strMap[intPlayerRequestedRow][intPlayerRequestedCol] = "g";
             intEnemiesDefeated += 1;

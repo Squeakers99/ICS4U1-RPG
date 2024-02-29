@@ -13,6 +13,9 @@ public class RPG_Game{
         //Initializes the console
         Console con = new Console("Sus Sus Amogus: The Game", 600, 600);
 
+        //Gets font to say which map is selected
+        Font fntMapSelected = con.loadFont("Fonts/Map Selected.ttf", 50);
+
         //Initializes inputs for selection
         int intMouseX = 0;
         int intMouseY = 0;
@@ -22,6 +25,7 @@ public class RPG_Game{
         String strChoice;
         String strMap = "Map 1";
 
+        //Variable to control when the game starts
         boolean blnPlay = false;
 
         //Loops until the user decides to play
@@ -33,12 +37,20 @@ public class RPG_Game{
             if(strChoice.equals("Select Map")){
                 con.sleep(300);
                 strMap = mapSelect(con, intMouseX, intMouseY, intMouseButtonClicked);
+
+                con.setDrawColor(Color.white);
+                con.setDrawFont(fntMapSelected);
+                con.drawString(strMap + " Selected!",80,475);
+                con.repaint();
+                con.sleep(3000);
+
                 con.setDrawColor(Color.black);
                 con.fillRect(0, 0, 600, 600);
                 con.repaint();
 
             //Runs the help screen
             }else if(strChoice.equals("Help")){
+                Help(con);
 
             //Quits the console
             }else if(strChoice.equals("Quit")){
@@ -156,6 +168,9 @@ public class RPG_Game{
         //Initializes images and fonts
         BufferedImage imgMapSelectBackground = con.loadImage("Images/Map Select/Map Select Screen.png");
         BufferedImage imgMap1 = con.loadImage("Images/Map Select/Map 1.png");
+        BufferedImage imgMap2 = con.loadImage("Images/Map Select/Map 2.png");
+        BufferedImage imgMap3 = con.loadImage("Images/Map Select/Map 3.png");
+        BufferedImage imgMap4 = con.loadImage("Images/Map Select/Map 4.png");
 
         Font fntMapText = con.loadFont("Fonts/Map Select Font.otf", 50);
 
@@ -175,34 +190,39 @@ public class RPG_Game{
             //If statement for the left cycle button
             if(((intMouseX < 55) && (intMouseX > 15)) && ((intMouseY < 280) && (intMouseY > 240)) && intMouseButtonClicked == 1){
                 intCycleCounter--;
+                con.sleep(200);
             
             //If statement for the right cycle button
             }else if(((intMouseX < 585) && (intMouseX > 550)) && ((intMouseY < 280) && (intMouseY > 240)) && intMouseButtonClicked == 1){
                 intCycleCounter++;
+                con.sleep(200);
             }
 
             //If statement for what maps to display
             if(intCycleCounter%4 == 0){
                 con.drawImage(imgMap1, 70, 160);
                 con.drawString("Map 1", 130, 350);
-                con.drawImage(imgMap1, 330, 160);
+                con.drawImage(imgMap2, 330, 160);
                 con.drawString("Map 2", 385, 350);
             }else if((intCycleCounter%4 == 1) || (intCycleCounter%4 == -3)){
-                con.drawImage(imgMap1, 70, 160);
+                con.drawImage(imgMap2, 70, 160);
                 con.drawString("Map 2", 130, 350);
-                con.drawImage(imgMap1, 330, 160);
+                con.drawImage(imgMap3, 330, 160);
                 con.drawString("Map 3", 385, 350);
             }else if((intCycleCounter%4 == 2) || (intCycleCounter%4 == -2)){
-                con.drawImage(imgMap1, 70, 160);
+                con.drawImage(imgMap3, 70, 160);
                 con.drawString("Map 3", 130, 350);
-                con.drawImage(imgMap1, 330, 160);
+                con.drawImage(imgMap4, 330, 160);
                 con.drawString("Map 4", 385, 350);
             }else if((intCycleCounter%4 == 3) || (intCycleCounter%4 == -1)){
-                con.drawImage(imgMap1, 70, 160);
+                con.drawImage(imgMap4, 70, 160);
                 con.drawString("Map 4", 130, 350);
                 con.drawImage(imgMap1, 330, 160);
                 con.drawString("Map 1", 385, 350);
             }
+
+            //Lessens glitchiness
+            con.sleep(50);
 
              //Decides what map to return
              if(intCycleCounter%4 == 0){
@@ -233,7 +253,29 @@ public class RPG_Game{
 
             //Paints all maps and delays so multiple clicks dont register
             con.repaint();
-            con.sleep(100);
+        }
+    }
+
+    //Help screen method
+    public static void Help(Console con){
+        //Initializes integer variables
+        int intCurrentKey = con.currentKey();
+        int intHelpY;
+
+        //Initializes help screen image
+        BufferedImage imgHelpScreen = con.loadImage("Images/Help Screen.png");
+
+        for(intHelpY = 600; intHelpY >= 0; intHelpY -= 15){
+            //Draws the help screen
+            con.setDrawColor(Color.black);
+            con.drawImage(imgHelpScreen, 0, intHelpY);
+            con.repaint();
+            con.sleep(16);
+        }
+
+        //Waits for the user to press escape
+        while(intCurrentKey != 27){
+            intCurrentKey = con.currentKey();
         }
     }
 }
