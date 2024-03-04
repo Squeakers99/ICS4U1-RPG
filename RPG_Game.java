@@ -263,7 +263,7 @@ public class RPG_Game{
         int intHelpY;
 
         //Initializes help screen image
-        BufferedImage imgHelpScreen = con.loadImage("Images/Help Screen.png");
+        BufferedImage imgHelpScreen = con.loadImage("Images/Other/Help Screen.png");
 
         for(intHelpY = 600; intHelpY >= 0; intHelpY -= 15){
             //Draws the help screen
@@ -277,5 +277,10 @@ public class RPG_Game{
         while(intCurrentKey != 27){
             intCurrentKey = con.currentKey();
         }
+
+        //Repaints a plain black screen
+        con.setDrawColor(Color.black);
+        con.fillRect(0, 0, 600, 600);
+        con.repaint();
     }
 }

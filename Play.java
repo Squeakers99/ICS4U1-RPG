@@ -476,7 +476,7 @@ public class Play {
             con.drawString("E3 Defence: " + intEnemy3Stats[1], 425, intHUD_Y+290);
             con.drawString("E3 Damage: " + intEnemy3Stats[2], 425, intHUD_Y+320);
 
-            //Gets ready for the next loop by adding 50 to the y and animates at 30 FPS
+            //Gets ready for the next loop by adding the interval
             intHUD_Y += intInterval;
             con.sleep(16);
             con.repaint();
