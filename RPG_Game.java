@@ -265,8 +265,8 @@ public class RPG_Game{
         //Initializes help screen image
         BufferedImage imgHelpScreen = con.loadImage("Images/Other/Help Screen.png");
 
+        //Animates the help screen
         for(intHelpY = 600; intHelpY >= 0; intHelpY -= 15){
-            //Draws the help screen
             con.setDrawColor(Color.black);
             con.drawImage(imgHelpScreen, 0, intHelpY);
             con.repaint();

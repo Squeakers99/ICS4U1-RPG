@@ -24,7 +24,6 @@ public class Play {
 
     private static String strMap[][] = new String[20][20];
     private static int intEnemyCount;
-    private static int intEnemiesDefeated = 0;
     private static boolean blnContinue = true;  
 
     //Method to play the game
@@ -62,6 +61,7 @@ public class Play {
         int intPlayerX = 0;
         int intPlayerY = 0;
         int intAnimationLoop = 0;
+        int intLoopCount = 0;
         
         //Initalizes all Boolean variables
         boolean blnHUDActive = false;
@@ -77,6 +77,7 @@ public class Play {
         BufferedImage imgDrowned = con.loadImage("Images/Other/Drowned.png");
         BufferedImage imgDeath = con.loadImage("Images/Other/Death.png");
         BufferedImage imgPlayerDeath = con.loadImage("Images/Other/Player (Death Animation).png");
+        BufferedImage imgWin = con.loadImage("Images/Other/Win.png");
 
         //Loads the array with the chosen map
         for(intCountRows = 0; intCountRows < 20; intCountRows++){
@@ -195,6 +196,28 @@ public class Play {
 
                             intPlayerCol = intPlayerX/30;
                         }
+
+                        //Sets the loop count to 0 to prevent idle animation while moving
+                        intLoopCount = 0;
+                    }else if(intLoopCount%30 == 0){
+                        for(intAnimationLoop = intPlayerX; intAnimationLoop >= intPlayerX - 6; intAnimationLoop -= 2) {
+                            drawMap(con, intCountColumns, intCountRows);
+                            con.drawImage(imgPlayer, intAnimationLoop, intPlayerY);
+                            con.repaint();
+                            con.sleep(16);
+                        }
+                        for(intAnimationLoop = intPlayerX - 6; intAnimationLoop <= intPlayerX + 6; intAnimationLoop += 2) {
+                            drawMap(con, intCountColumns, intCountRows);
+                            con.drawImage(imgPlayer, intAnimationLoop, intPlayerY);
+                            con.repaint();
+                            con.sleep(16);
+                        }
+                        for(intAnimationLoop = intPlayerX + 6; intAnimationLoop >= intPlayerX; intAnimationLoop -= 2) {
+                            drawMap(con, intCountColumns, intCountRows);
+                            con.drawImage(imgPlayer, intAnimationLoop, intPlayerY);
+                            con.repaint();
+                            con.sleep(16);
+                        }
                     }
 
                     //Draws the drowned screen if they drowned after player is animated
@@ -231,14 +254,21 @@ public class Play {
                     }
 
                     //Checks if the player beat all the enemies
-                    if(intEnemiesDefeated == intEnemyCount){
-                        //Win Code here
+                    if(intEnemyCount == 0){
+                        for(intAnimationLoop = 600; intAnimationLoop >= 0; intAnimationLoop -= 15) {
+                            con.drawImage(imgWin, intAnimationLoop, 0);
+                            con.repaint();
+                            con.sleep(16);
+                        }
+                        blnContinue = false;
                     }
 
-                    //Redraws the console and delays to prevent multiple inputs
+                    //Redraws the console, delays to prevent multiple inputs, and adds 1 to the loop count
                     con.sleep(100);
+                    intLoopCount++;
                     con.repaint();
                 }
+
             
             //If an array error is caught, the player cannot go there because it is outside the map. It does nothing
             }catch(Exception ArrayIndexOutOfBounds){}
@@ -324,9 +354,12 @@ public class Play {
             strMap[intPlayerRequestedRow][intPlayerRequestedCol] = "g";
         
         //Checks if the next block is a defence boost
-        }else if(strNextBlock.equals("s") && intPlayerStats[1] < 100 && intPlayerStats[1] > 0){
+        }else if(strNextBlock.equals("s") && intPlayerStats[1] < 100 && intPlayerStats[1] > 0 && intPlayerStats[0] < 100){
             //Adds 10 to the player's defence and replaces the block with grass
             intPlayerStats[1] += 10;
+            if(intPlayerStats[1] > 100){
+                intPlayerStats[1] = 100;
+            }
             strMap[intPlayerRequestedRow][intPlayerRequestedCol] = "g";
 
         //Checks if the next block is a damage boost
@@ -359,7 +392,6 @@ public class Play {
                 intPlayerStats[1] -= 5;
             }
             strMap[intPlayerRequestedRow][intPlayerRequestedCol] = "g";
-            intEnemiesDefeated += 1;
         }
 
         //If the next block is anything but a tree, this will run
