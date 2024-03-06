@@ -311,7 +311,7 @@ public class BattleAnimations{
     //Method to animate the full enemy 1 animation
     public static void enemy1Animation(){
         //Animates the enemy and player if player health is above 0
-        enemyAnimation(1, 170, 360, 385);
+        enemyAnimation(1, 170, 360, 450);
         if(Play.intPlayerStats[0] > 0){
             playerAnimation(1, -24);
         }else{
