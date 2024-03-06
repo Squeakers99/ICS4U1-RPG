@@ -70,7 +70,8 @@ public class RPG_Game{
     //Method to display the menu
     public static String GameMenu(Console con, int intMouseX, int intMouseY, int intMouseButtonClicked){
         //Loads the menu fonts into the game
-        Font fntTitle = con.loadFont("Fonts/Menu Title.ttf", 100);
+        Font fntTitle = con.loadFont("Fonts/Menu Title.ttf", 90);
+        Font fntSubtitle = con.loadFont("Fonts/Menu Title.ttf", 70);
         Font fntButtons = con.loadFont("Fonts/Menu Options.otf", 75);
         
         //Sets the draw color to White
@@ -78,7 +79,9 @@ public class RPG_Game{
 
         //Draws the Title for the Game
         con.setDrawFont(fntTitle);
-        con.drawString("The Great RPG", 23, 30);
+        con.drawString("Sus Sus Amogus", 20, 0);
+        con.setDrawFont(fntSubtitle);
+        con.drawString("The Game", 175, 100);
 
         //Sets the font to draw the buttons
         con.setDrawFont(fntButtons);
