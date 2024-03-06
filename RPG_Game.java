@@ -9,9 +9,10 @@ import java.awt.*;
 import java.awt.image.*;
 
 public class RPG_Game{
+    public static Console con = new Console("Sus Sus Amogus: The Game", 600, 600);
+
     public static void main(String[] args){
         //Initializes the console
-        Console con = new Console("Sus Sus Amogus: The Game", 600, 600);
 
         //Gets font to say which map is selected
         Font fntMapSelected = con.loadFont("Fonts/Map Selected.ttf", 50);
@@ -50,7 +51,7 @@ public class RPG_Game{
 
             //Runs the help screen
             }else if(strChoice.equals("Help")){
-                Help(con);
+                Help();
 
             //Quits the console
             }else if(strChoice.equals("Quit")){
@@ -63,7 +64,7 @@ public class RPG_Game{
         }
 
         //Runs the game
-        Play.Game(con, strMap);
+        Play.Game(strMap);
     }
 
     //Method to display the menu
@@ -257,7 +258,7 @@ public class RPG_Game{
     }
 
     //Help screen method
-    public static void Help(Console con){
+    public static void Help(){
         //Initializes integer variables
         int intCurrentKey = con.currentKey();
         int intHelpY;
